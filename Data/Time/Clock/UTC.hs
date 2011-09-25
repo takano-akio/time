@@ -12,7 +12,8 @@ module Data.Time.Clock.UTC
 	-- 
 	-- If you don't care about leap seconds, use UTCTime and NominalDiffTime for your clock calculations,
 	-- and you'll be fine.
-	UTCTime(..),NominalDiffTime
+	UTCTime (..), NominalDiffTime (..),
+	diffToNominal
 ) where
 
 import Control.DeepSeq
@@ -118,3 +119,9 @@ instance RealFrac NominalDiffTime where
 	round (MkNominalDiffTime a) = round a
 	ceiling (MkNominalDiffTime a) = ceiling a
 	floor (MkNominalDiffTime a) = floor a
+
+-- this only makes sense for differences ≤ 1 day
+{-# INLINABLE diffToNominal #-}
+diffToNominal :: DiffTime -> NominalDiffTime
+diffToNominal (MkDiffTime ps) = MkNominalDiffTime ps
+
