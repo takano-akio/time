@@ -8,6 +8,7 @@ module Data.Time.Calendar.Days
 ) where
 
 import Control.DeepSeq
+import Data.Int
 import Data.Ix
 import Data.Typeable
 #if LANGUAGE_Rank2Types
@@ -15,7 +16,7 @@ import Data.Data
 #endif
 
 -- | The Modified Julian Day is a standard count of days, with zero being the day 1858-11-17.
-newtype Day = ModifiedJulianDay {toModifiedJulianDay :: Integer} deriving (Eq,Ord
+newtype Day = ModifiedJulianDay {toModifiedJulianDay :: Int64} deriving (Eq,Ord
 #if LANGUAGE_DeriveDataTypeable
 #if LANGUAGE_Rank2Types
     ,Data
@@ -47,10 +48,10 @@ instance Ix Day where
 	inRange (ModifiedJulianDay a,ModifiedJulianDay b) (ModifiedJulianDay c) = inRange (a,b) c
 	rangeSize (ModifiedJulianDay a,ModifiedJulianDay b) = rangeSize (a,b)
 
-addDays :: Integer -> Day -> Day
+addDays :: Int64 -> Day -> Day
 addDays n (ModifiedJulianDay a) = ModifiedJulianDay (a + n)
 
-diffDays :: Day -> Day -> Integer
+diffDays :: Day -> Day -> Int64
 diffDays (ModifiedJulianDay a) (ModifiedJulianDay b) = a - b
 
 {-

@@ -37,7 +37,7 @@ posixSecondsToUTCTime i = let
 
 utcTimeToPOSIXSeconds :: UTCTime -> POSIXTime
 utcTimeToPOSIXSeconds (UTCTime d t) =
- (fromInteger (diffDays d unixEpochDay) * posixDayLength) + min posixDayLength (realToFrac t)
+ (fromIntegral (diffDays d unixEpochDay) * posixDayLength) + min posixDayLength (realToFrac t)
 
 -- | Get the current POSIX time from the system clock.
 getPOSIXTime :: IO POSIXTime

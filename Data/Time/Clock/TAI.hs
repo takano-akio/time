@@ -15,6 +15,7 @@ module Data.Time.Clock.TAI
 	parseTAIUTCDATFile
 ) where
 
+import Data.Int
 import Data.Time.LocalTime
 import Data.Time.Calendar.Days
 import Data.Time.Clock
@@ -60,7 +61,7 @@ diffAbsoluteTime (MkAbsoluteTime a) (MkAbsoluteTime b) = a - b
 -- | TAI - UTC during this day.
 -- No table is provided, as any program compiled with it would become
 -- out of date in six months.
-type LeapSecondTable = Day -> Integer
+type LeapSecondTable = Day -> Int64
 
 utcDayLength :: LeapSecondTable -> Day -> DiffTime
 utcDayLength table day = realToFrac (86400 + (table (addDays 1 day)) - (table day))
@@ -84,12 +85,12 @@ taiToUTCTime table abstime = stable (ModifiedJulianDay (div' (unAbsoluteTime abs
 -- not in the correct format.
 parseTAIUTCDATFile :: String -> LeapSecondTable
 parseTAIUTCDATFile ss = offsetlist 0 (parse (lines ss)) where
-	offsetlist :: Integer -> [(Day,Integer)] -> LeapSecondTable
+	offsetlist :: Int64 -> [(Day,Int64)] -> LeapSecondTable
 	offsetlist i [] _ = i
 	offsetlist i ((d0,_):_) d | d < d0 = i
 	offsetlist _ ((_,i0):xx) d = offsetlist i0 xx d
 	
-	parse :: [String] -> [(Day,Integer)]
+	parse :: [String] -> [(Day,Int64)]
 	parse [] = []
 	parse (a:as) = let
 		ps = parse as
@@ -97,7 +98,7 @@ parseTAIUTCDATFile ss = offsetlist 0 (parse (lines ss)) where
 		Just di -> di:ps
 		Nothing -> ps
 	
-	matchLine :: String -> Maybe (Day,Integer)
+	matchLine :: String -> Maybe (Day,Int64)
 	matchLine s = do
 		check0S s
 		(d,s') <- findJD s
@@ -112,18 +113,18 @@ parseTAIUTCDATFile ss = offsetlist 0 (parse (lines ss)) where
 	
 	findJD :: String -> Maybe (Day,String)
 	findJD ('=':'J':'D':s) = do
-		d <- getInteger '5' s
+		d <- getInt64 '5' s
 		return (ModifiedJulianDay (d - 2400000),s)
 	findJD [] = Nothing
 	findJD (_:cs) = findJD cs
 	
-	findOffset :: String -> Maybe Integer
-	findOffset ('T':'A':'I':'-':'U':'T':'C':'=':s) = getInteger '0' s
+	findOffset :: String -> Maybe Int64
+	findOffset ('T':'A':'I':'-':'U':'T':'C':'=':s) = getInt64 '0' s
 	findOffset [] = Nothing
 	findOffset (_:cs) = findOffset cs
 	
-	getInteger :: Char -> String -> Maybe Integer
-	getInteger p s = do
+	getInt64 :: Char -> String -> Maybe Int64
+	getInt64 p s = do
 		digits <- getDigits p s
 		fromDigits 0 digits
 	
@@ -136,7 +137,7 @@ parseTAIUTCDATFile ss = offsetlist 0 (parse (lines ss)) where
 	getDigits _ _ = Nothing
 		
 	
-	fromDigits :: Integer -> String -> Maybe Integer
+	fromDigits :: Int64 -> String -> Maybe Int64
 	fromDigits i [] = Just i
 	fromDigits i (c:cs) | c >= '0' && c <= '9' = fromDigits ((i * 10) + (fromIntegral ((fromEnum c) - (fromEnum '0')))) cs
 	fromDigits _ _ = Nothing

@@ -11,6 +11,7 @@ module Data.Time.Format.Parse
     ParseTime(..)
     ) where
 
+import Data.Int
 import Data.Time.Clock.POSIX
 import Data.Time.Clock
 import Data.Time.Calendar
@@ -205,8 +206,8 @@ parseValue l mpad c =
 -- * Instances for the time package types
 --
 
-data DayComponent = Year Integer -- 0-99, last two digits of both real years and week years
-                  | Century Integer -- century of all years
+data DayComponent = Year Int64 -- 0-99, last two digits of both real years and week years
+                  | Century Int64 -- century of all years
                   | Month Int -- 1-12
                   | Day Int -- 1-31
                   | YearDay Int -- 1-366
@@ -292,7 +293,7 @@ instance ParseTime TimeOfDay where
                 'k' -> TimeOfDay (read x) m s
                 'l' -> TimeOfDay (read x) m s
                 'M' -> TimeOfDay h (read x) s
-                'S' -> TimeOfDay h m (fromInteger (read x))
+                'S' -> TimeOfDay h m (fromIntegral (read x))
                 'q' -> TimeOfDay h m (mkPico (truncate s) (read x))
                 'Q' -> if null x then t 
                         else let ps = read $ take 12 $ rpad 12 '0' $ drop 1 x
