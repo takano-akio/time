@@ -8,7 +8,7 @@ module Data.Time.Clock.Scale
 	UniversalTime(..),
 
 	-- * Absolute intervals
-	DiffTime,
+	DiffTime (..),
         secondsToDiffTime, picosecondsToDiffTime
 ) where
 
